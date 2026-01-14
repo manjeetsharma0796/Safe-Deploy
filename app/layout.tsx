@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
-  title: "Mantle Deploy Guard",
+  title: "Safe Deploy",
   description: "Pre-flight diagnostic dashboard for Mantle smart contract developers.",
 };
 

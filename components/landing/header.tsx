@@ -9,7 +9,7 @@ export function Header() {
         <header className="absolute top-0 w-full z-50 h-20 flex items-center justify-between px-6 md:px-12 backdrop-blur-sm">
             <Link href="/" className="flex items-center gap-2">
                 <ShieldCheck className="h-8 w-8 text-primary" />
-                <span className="text-xl font-bold tracking-tight">Mantle Deploy Guard</span>
+                <span className="text-xl font-bold tracking-tight">Safe Deploy</span>
             </Link>
 
             <Link href="/dashboard">

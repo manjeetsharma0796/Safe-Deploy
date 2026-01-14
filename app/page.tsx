@@ -131,7 +131,7 @@ export default function LandingPage() {
             <footer className="py-12 px-6 border-t border-border/50 text-center text-muted-foreground text-sm">
                 <div className="flex items-center justify-center gap-2 mb-4">
                     <ShieldCheck className="h-5 w-5 text-primary" />
-                    <span className="font-bold text-foreground">Mantle Deploy Guard</span>
+                    <span className="font-bold text-foreground">Safe Deploy</span>
                 </div>
                 <p>&copy; 2026 Mantle Hackathon Project. Built with Next.js, Wagmi & RainbowKit.</p>
             </footer>

@@ -111,7 +111,7 @@ export function Header() {
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <ShieldCheck className="h-6 w-6 text-primary" />
                 <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
-                    Mantle Deploy Guard
+                    Safe Deploy
                 </h1>
             </Link>
 

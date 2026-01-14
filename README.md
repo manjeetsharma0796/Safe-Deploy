@@ -1,4 +1,4 @@
-# 🛡️ Mantle Deploy Guard
+# 🛡️ Safe Deploy
 
 > **AI-Powered Smart Contract Security & Deployment Platform**  
 > Built on Mantle Sepolia Testnet | Infrastructure × AI Track
@@ -19,7 +19,7 @@ Deploying smart contracts is risky:
 
 ## 💡 Solution
 
-**Mantle Deploy Guard** is an all-in-one platform that combines **AI-powered security analysis** with **real-time infrastructure monitoring** to ensure safe, optimized contract deployments on Mantle Network.
+**Safe Deploy** is an all-in-one platform that combines **AI-powered security analysis** with **real-time infrastructure monitoring** to ensure safe, optimized contract deployments on Mantle Network.
 
 ---
 

@@ -1,4 +1,4 @@
-// Token Name: Deploy Guard Token ($GUARD)
+// Token Name: Safe Deploy Token ($GUARD)
 // Network: Mantle Sepolia Testnet
 
 export const GUARD_TOKEN_ADDRESS = '0x04965fcdc275cce9dbeea4e6b938edcdcdff0d86'
