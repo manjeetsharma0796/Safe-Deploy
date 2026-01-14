@@ -20,9 +20,10 @@ import { useEffect } from 'react'
 
 interface ReportPanelProps {
     code: string
+    onContractSaved?: () => void
 }
 
-export function ReportPanel({ code }: ReportPanelProps) {
+export function ReportPanel({ code, onContractSaved }: ReportPanelProps) {
     const [activeTab, setActiveTab] = useState('status')
     const { mutate: compile, data: compileResult, isPending: isCompiling } = useCompile()
     const { isConnected, chain } = useAccount()
@@ -57,6 +58,8 @@ export function ReportPanel({ code }: ReportPanelProps) {
     const publicClient = usePublicClient()
     const [isDeploying, setIsDeploying] = useState(false)
 
+    const { address } = useAccount()
+
     const handleDeploy = async () => {
         if (!compileResult || !('abi' in compileResult) || !walletClient || !publicClient) return
 
@@ -81,6 +84,27 @@ export function ReportPanel({ code }: ReportPanelProps) {
             if (receipt.status === 'success') {
                 toast.success(`Contract Deployed! Address: ${receipt.contractAddress}`, { id: toastId, duration: 8000 })
                 console.log("Deployed Address:", receipt.contractAddress)
+
+                // Save contract to MongoDB
+                if (address) {
+                    try {
+                        await fetch('/api/contracts', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                userAddress: address,
+                                name: compileResult.contractName || 'Untitled',
+                                code: code,
+                                deployedAddress: receipt.contractAddress,
+                                network: 'sepolia'
+                            })
+                        })
+                        onContractSaved?.()
+                        toast.success('Contract saved to history!')
+                    } catch (saveError) {
+                        console.error('Failed to save contract:', saveError)
+                    }
+                }
             } else {
                 toast.error('Deployment Failed: Transaction Reverted', { id: toastId })
             }
