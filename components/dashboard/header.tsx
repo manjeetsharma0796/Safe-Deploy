@@ -1,8 +1,105 @@
+'use client'
+
 import Link from 'next/link'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { ShieldCheck } from 'lucide-react'
+import { ShieldCheck, Gift, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useAccount } from 'wagmi'
+import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 
 export function Header() {
+    const { address, isConnected } = useAccount()
+    const [canClaim, setCanClaim] = useState(false)
+    const [isClaiming, setIsClaiming] = useState(false)
+    const [remainingTime, setRemainingTime] = useState<string>('')
+    const [remainingMs, setRemainingMs] = useState(0)
+
+    // Check claim status
+    useEffect(() => {
+        if (!address) {
+            setCanClaim(false)
+            return
+        }
+
+        const checkStatus = async () => {
+            try {
+                const res = await fetch(`/api/claim?address=${address}`)
+                const data = await res.json()
+                setCanClaim(data.canClaim)
+                setRemainingMs(data.remainingMs || 0)
+            } catch (error) {
+                console.error('Failed to check claim status:', error)
+            }
+        }
+
+        checkStatus()
+        const interval = setInterval(checkStatus, 30000) // Check every 30s
+        return () => clearInterval(interval)
+    }, [address])
+
+    // Update countdown timer
+    useEffect(() => {
+        if (remainingMs <= 0) {
+            setRemainingTime('')
+            return
+        }
+
+        const updateTimer = () => {
+            const newRemaining = remainingMs - 1000
+            setRemainingMs(Math.max(0, newRemaining))
+
+            const hours = Math.floor(newRemaining / (1000 * 60 * 60))
+            const minutes = Math.floor((newRemaining % (1000 * 60 * 60)) / (1000 * 60))
+
+            if (hours > 0) {
+                setRemainingTime(`${hours}h ${minutes}m`)
+            } else if (minutes > 0) {
+                setRemainingTime(`${minutes}m`)
+            } else {
+                setRemainingTime('Ready!')
+                setCanClaim(true)
+            }
+        }
+
+        updateTimer()
+        const interval = setInterval(updateTimer, 1000)
+        return () => clearInterval(interval)
+    }, [remainingMs])
+
+    const handleClaim = async () => {
+        if (!address || !canClaim || isClaiming) return
+
+        setIsClaiming(true)
+        const toastId = toast.loading('Claiming 20 GUARD tokens...')
+
+        try {
+            const res = await fetch('/api/claim', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address })
+            })
+
+            const data = await res.json()
+
+            if (data.success) {
+                toast.success('20 GUARD tokens claimed successfully!', { id: toastId, duration: 5000 })
+                setCanClaim(false)
+                setRemainingMs(24 * 60 * 60 * 1000) // Reset to 24h
+            } else {
+                toast.error(`Claim failed: ${data.error}`, { id: toastId })
+                if (data.remainingMs) {
+                    setRemainingMs(data.remainingMs)
+                }
+            }
+        } catch (error: any) {
+            console.error('Claim error:', error)
+            toast.error('Failed to claim tokens', { id: toastId })
+        } finally {
+            setIsClaiming(false)
+        }
+    }
+
     return (
         <header className="flex h-16 items-center justify-between border-b px-6 bg-sidebar/50 backdrop-blur-sm">
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -12,7 +109,33 @@ export function Header() {
                 </h1>
             </Link>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+                {isConnected && (
+                    <Button
+                        size="sm"
+                        onClick={handleClaim}
+                        disabled={!canClaim || isClaiming}
+                        variant={canClaim ? "default" : "secondary"}
+                        className="h-9 px-4 font-semibold shadow-md"
+                    >
+                        {isClaiming ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Claiming...
+                            </>
+                        ) : canClaim ? (
+                            <>
+                                <Gift className="mr-2 h-4 w-4" />
+                                Claim 20 GUARD
+                            </>
+                        ) : (
+                            <>
+                                <Gift className="mr-2 h-4 w-4 opacity-50" />
+                                {remainingTime || 'Claimed'}
+                            </>
+                        )}
+                    </Button>
+                )}
                 <ConnectButton showBalance={false} />
             </div>
         </header>
